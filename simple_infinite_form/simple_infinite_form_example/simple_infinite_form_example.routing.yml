@@ -1,7 +1,14 @@
 simple_infinite_form_example.lucky_numbers:
-  path: '/admin/config/development/simple_infinite_form_example'
+  path: '/admin/config/development/simple_infinite_form_example/lucky_numbers'
   defaults:
     _title: 'Lucky Numbers'
     _form: '\Drupal\simple_infinite_form_example\Form\LuckyNumbersForm'
+  requirements:
+    _permission: 'administer site configuration'
+simple_infinite_form_example.favorite_articles:
+  path: '/admin/config/development/simple_infinite_form_example/favorite_articles'
+  defaults:
+    _title: 'Favorite Articles'
+    _form: '\Drupal\simple_infinite_form_example\Form\FavoriteArticlesForm'
   requirements:
     _permission: 'administer site configuration'
