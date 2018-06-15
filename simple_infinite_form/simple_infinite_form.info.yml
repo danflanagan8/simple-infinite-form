@@ -1,0 +1,6 @@
+name: Simple Infinite Form
+type: module
+description: 'Provides Form Base for Simple Infinite Config form.'
+package: form
+version: VERSION
+core: 8.x

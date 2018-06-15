@@ -1,0 +1,7 @@
+simple_infinite_form_example.lucky_numbers:
+  path: '/admin/config/development/simple_infinite_form_example'
+  defaults:
+    _title: 'Lucky Numbers'
+    _form: '\Drupal\simple_infinite_form_example\Form\LuckyNumbersForm'
+  requirements:
+    _permission: 'administer site configuration'
