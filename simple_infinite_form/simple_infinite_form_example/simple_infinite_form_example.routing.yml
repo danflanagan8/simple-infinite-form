@@ -12,3 +12,10 @@ simple_infinite_form_example.favorite_articles:
     _form: '\Drupal\simple_infinite_form_example\Form\FavoriteArticlesForm'
   requirements:
     _permission: 'administer site configuration'
+simple_infinite_form_example.coolest_rockers:
+  path: '/admin/config/development/simple_infinite_form_example/coolest_rockers'
+  defaults:
+    _title: 'Coolest Rockers'
+    _form: '\Drupal\simple_infinite_form_example\Form\CoolestRockersForm'
+  requirements:
+    _permission: 'administer site configuration'

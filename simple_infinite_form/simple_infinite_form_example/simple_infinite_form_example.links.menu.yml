@@ -8,3 +8,8 @@ simple_infinite_form_example.favorite_articles:
   route_name: simple_infinite_form_example.favorite_articles
   description: 'Access Favorite Articles Form'
   parent: 'system.admin_config_development'
+simple_infinite_form_example.coolest_rockers:
+  title: 'Simple Infinite Form: Coolest Rockers'
+  route_name: simple_infinite_form_example.coolest_rockers
+  description: 'Access Coolest Rockers Form'
+  parent: 'system.admin_config_development'
