@@ -37,48 +37,51 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
-    $config = $this->config($this->getEditableConfigNames()[0]);
-
-    $this->getSlots($form_state, $config);
+    $this->initForm($form_state);
     $form['intro'] = $this->makeIntro();
     $form['infinite_values'] = $this->makeInfiniteValuesContainer();
-    $this->populateInfiniteValues($form, $form_state, $config);
+    $this->populateInfiniteValues($form, $form_state);
     $form['add_slot'] = $this->makeAddSlotButton();
 
-    return parent::buildForm($form, $form_state, $config);
+    return parent::buildForm($form, $form_state);
   }
+
+  public function initForm(FormStateInterface $form_state){
+    if ($form_state->get('already_initialized')) {
+      return;
+    }
+    $config = $this->config($this->getEditableConfigNames()[0]);
+    if (!empty($config->get($this->getConfigKeyName()))) {
+      $form_state->setValue('infinite_values', $config->get($this->getConfigKeyName()));
+      $slots = count($config->get($this->getConfigKeyName())) + 1;
+      $form_state->set('slots', $slots);
+    }
+    else {
+      $form_state->set('slots', 1);
+    }
+    $form_state->set('already_initialized', TRUE);
+  }
+
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->configFactory()->getEditable($this->getEditableConfigNames()[0]);
-    $rows = $form_state->getValue(['infinite_values']);
+    $rows = $form_state->cleanValues()->getValue(['infinite_values']);
     $values_to_save = [];
     //strip away empty values. Be careful not to strip zero, though.
     foreach($rows as $row){
       if(!$this->rowIsEmpty($row)){
+        if (count($row) === 1) {
+          $row = $row[0];
+        }
         $values_to_save[] = $row;
       }
     }
     $config->set($this->getConfigKeyName(), $values_to_save);
     $config->save();
     parent::submitForm($form, $form_state);
-  }
-
-  public function getSlots(FormStateInterface $form_state, $config) {
-    //This block determines how many slots to show
-    $slots = $form_state->get('slots');
-    if ($slots == NULL) {
-      if (!empty($config->get($this->getConfigKeyName()))) {
-        $slots = count($config->get($this->getConfigKeyName())) + 1; //always have at least on open slot.
-        $form_state->set('slots', $slots);
-      }
-      else {
-        $slots = 1; //always have at least on open slot.
-        $form_state->set('slots', $slots);
-      }
-    }
   }
 
   public function makeAddSlotButton() {
@@ -95,12 +98,41 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
     ];
   }
 
+  public function makeDeleteSlotButton($i) {
+    return [
+      '#type' => 'submit',
+      '#value' => 'Delete Slot',
+      '#id' => "delete_slot-$i",
+      '#name' => "delete_slot-$i", //doesn't work without a name!
+      '#submit' => ['::deleteSlotSubmit'],
+      '#ajax' => [
+        'callback' => [$this, 'deleteSlotCallback'],
+        'event' => 'click',
+        'wrapper' => 'infinite-values-wrapper',
+      ],
+    ];
+  }
+
   public function addSlotSubmit(array &$form, FormStateInterface $form_state){
     $form_state->set('slots', $form_state->get('slots') + 1);
     $form_state->setRebuild(true);
   }
 
   public function addSlotCallback(array &$form, FormStateInterface $form_state){
+    return $form['infinite_values'];
+  }
+
+  public function deleteSlotSubmit(array &$form, FormStateInterface $form_state){
+    $id = $form_state->getTriggeringElement()['#id'];
+    $index = explode("-", $id)[1];
+    $infinite_values = $form_state->getValue('infinite_values');
+    array_splice($infinite_values, $index, 1);
+    $infinite_values = $form_state->setValue('infinite_values', $infinite_values);
+    $form_state->set('slots', $form_state->get('slots') - 1);
+    $form_state->setRebuild(true);
+  }
+
+  public function deleteSlotCallback(array &$form, FormStateInterface $form_state){
     return $form['infinite_values'];
   }
 

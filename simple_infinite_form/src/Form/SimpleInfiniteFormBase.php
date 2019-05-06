@@ -56,7 +56,7 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
   public function makeInfiniteValuesContainer() {
     return [
       '#tree' => TRUE,
-      '#type' => 'container',
+      '#type' => 'table',
       '#prefix' => '<div id="infinite-values-wrapper"><h2>'.ucfirst($this->getConfigKeyName()).'</h2>',
       '#suffix' => '</div>',
     ];
@@ -65,24 +65,28 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  public function populateInfiniteValues(array &$form, FormStateInterface $form_state, $config) {
+  public function populateInfiniteValues(array &$form, FormStateInterface $form_state) {
     $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
+    $config = $this->config($this->getEditableConfigNames()[0]);
+    $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
     for($i = 0; $i < $slots ;$i++){
-      $default = NULL;
-      if(isset($config->get($this->getConfigKeyName())[$i])){
+      $value = NULL;
+      if(isset($infinite_values[$i])){
         if($this->getInputType() == 'entity_autocomplete'){
-          $default = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($config->get($this->getConfigKeyName())[$i]);
+          $value = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($infinite_values[$i]);
           $bundles = $this->getEntityBundles();
         }else{
-          $default = $config->get($this->getConfigKeyName())[$i];
+          $value = $infinite_values[$i];
         }
       }
-      $form['infinite_values'][$i] = [
+      $form['infinite_values'][$i][] = [
         '#type' => $this->getInputType(),
         '#target_type' => $this->getEntityType(),
-        '#default_value' => $default,
+        '#value' => $value,
         '#required' => FALSE,
       ];
+      $form['infinite_values'][$i][] = $this->makeDeleteSlotButton($i);
+
       if(!empty($bundles)){
         $form['infinite_values'][$i]['#selection_settings'] = [
           'target_bundles' => $bundles,
@@ -94,9 +98,11 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  public function rowIsEmpty($row){
-    if($row !== '' && $row !== NULL){
-      return FALSE;
+  public function rowIsEmpty($row) {
+    foreach ($row as $key => $val) {
+      if($val !== '' && $val !== NULL){
+        return FALSE;
+      }
     }
     return TRUE;
   }

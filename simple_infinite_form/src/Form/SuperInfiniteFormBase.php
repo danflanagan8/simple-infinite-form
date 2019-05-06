@@ -81,7 +81,8 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       $header[$key] = isset($val['#header_text']) ? $this->t($val['#header_text']) : $key;
     }
     $header['weight'] = $this->t('Weight');
-    return  $header;
+    $header['delete'] = $this->t('Delete');
+    return $header;
   }
 
   /**
@@ -108,13 +109,14 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  public function populateInfiniteValues(array &$form, FormStateInterface $form_state, $config) {
+  public function populateInfiniteValues(array &$form, FormStateInterface $form_state) {
     $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
+    $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
     for ($i = 0; $i < $slots; $i++) {
       $row = $this->baseElement();
       //add correct default value to each form element
       foreach ($row as $key => $element) {
-        $row[$key]['#default_value'] = isset($config->get($this->getConfigKeyName())[$i][$key]) ? $config->get($this->getConfigKeyName())[$i][$key] : NULL;
+        $row[$key]['#value'] = isset($infinite_values[$i][$key]) ? $infinite_values[$i][$key] : NULL;
       }
       //add some stuff to make it draggable
       $row['#attributes'] = [
@@ -124,9 +126,10 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       ];
       $row['weight'] = [
         '#type' => 'weight',
-        '#default_value' => isset($config->get($this->getConfigKeyName())[$i]['weight']) ? $config->get($this->getConfigKeyName())[$i]['weight'] : 0,
+        '#value' => isset($infinite_values[$i]['weight']) ? $infinite_values[$i]['weight'] : 0,
         '#attributes' => array('class' => array('idcfb-weight')),
       ];
+      $row['delete'] = $this->makeDeleteSlotButton($i);
       $form['infinite_values'][] = $row;
     }
   }
@@ -136,7 +139,7 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
    */
   public function rowIsEmpty($row) {
     foreach ($row as $key => $val) {
-      if ($key != 'weight' && !in_array($key, $this->neverEmpty())) {
+      if ($key != 'weight' && $key != 'delete' && !in_array($key, $this->neverEmpty())) {
         if($val !== '' && $val !== NULL){
           return FALSE;
         }

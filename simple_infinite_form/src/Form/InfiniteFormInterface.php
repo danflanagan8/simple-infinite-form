@@ -14,7 +14,7 @@ interface InfiniteFormInterface {
   /**
    * @return array|null
    */
-  public function populateInfiniteValues(array &$form, FormStateInterface $form_state, $config);
+  public function populateInfiniteValues(array &$form, FormStateInterface $form_state);
 
   /**
    * An empty row is dropped from config when saving. See the submit function.
