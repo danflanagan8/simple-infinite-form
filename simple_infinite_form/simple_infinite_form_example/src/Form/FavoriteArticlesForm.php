@@ -3,7 +3,6 @@
 namespace Drupal\simple_infinite_form_example\Form;
 
 use Drupal\simple_infinite_form\Form\SimpleInfiniteFormBase;
-use Drupal\Core\Form\FormStateInterface;
 
 /**
  * An example of a form that extends the SimpleInfiniteFormBase class.
@@ -68,12 +67,10 @@ class FavoriteArticlesForm extends SimpleInfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-
-    $form['header'] = [
+  protected function makeIntro() {
+    return [
       '#markup' => '<div><p>Select your favorite articles featured on this site. This is an example of how to extend the SimpleInfiniteFormBase class.</p></div>'
     ];
-
-    return parent::buildForm($form, $form_state);
   }
+
 }

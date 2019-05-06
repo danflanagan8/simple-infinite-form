@@ -41,7 +41,6 @@ class CoolestRockersForm extends SimpleInfiniteFormBase {
     return 'non-beatles';
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -49,9 +48,10 @@ class CoolestRockersForm extends SimpleInfiniteFormBase {
 
     $config = $this->config($this->getEditableConfigNames()[0]);
 
-    $form['header'] = [
+    $form['custom_intro'] = [
       '#markup' => '<div><p>Configure your favorite rockers. Select your favorite Beatle in the first field. Then enter as many other cool rockers as you want. This is an example of how to extend the SimpleInfiniteFormBase class.</p></div>'
     ];
+
     $form['beatle'] = [
       '#type' => 'select',
       '#options' => [
@@ -73,4 +73,5 @@ class CoolestRockersForm extends SimpleInfiniteFormBase {
     $config->save();
     parent::submitForm($form, $form_state);
   }
+  
 }

@@ -19,3 +19,10 @@ simple_infinite_form_example.coolest_rockers:
     _form: '\Drupal\simple_infinite_form_example\Form\CoolestRockersForm'
   requirements:
     _permission: 'administer site configuration'
+simple_infinite_form_example.speed_dial:
+  path: '/admin/config/development/simple_infinite_form_example/speed_dial'
+  defaults:
+    _title: 'Speed Dial'
+    _form: '\Drupal\simple_infinite_form_example\Form\SpeedDialForm'
+  requirements:
+    _permission: 'administer site configuration'
