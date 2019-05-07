@@ -18,7 +18,13 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
    * Note that you should NOT include anything about weight or tables.
    * That will happen automatically. Just put in the "mini form" that
    * goes in each row of the table. Include a '#header_text' to customize
-   * the header.
+   * the header. Do not enter any default_value or value either.
+   *
+   * Many input types are simple like...checkbox, checkboxes, color, date, email,
+   * machine_name, number, radio, radios, select,  tel, textarea, textfield,
+   * url
+   *
+   * For other intput types, you will likely have to customize populateInfiniteValues.
    *
    */
   protected function baseElement() {
@@ -76,13 +82,13 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
    */
   public function populateInfiniteValues(array &$form, FormStateInterface $form_state) {
     $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
-    $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
+    $infinite_values = $form_state->get('infinite_values');
     for ($i = 0; $i < $slots; $i++) {
       $row = $this->baseElement();
       //add correct default value to each form element
       foreach ($row as $key => $element) {
         if (isset($infinite_values[$i][$key])) {
-          //don't explicitly set value as null. Just set it if we have it.
+          $row[$key]['#default_value'] = $infinite_values[$i][$key];
           $row[$key]['#value'] = $infinite_values[$i][$key];
         }
       }

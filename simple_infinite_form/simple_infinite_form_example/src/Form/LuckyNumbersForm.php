@@ -52,7 +52,9 @@ class LuckyNumbersForm extends SimpleInfiniteFormBase {
    */
   protected function makeIntro() {
     return [
-      '#markup' => '<div><p>Enter any and all of your lucky numbers and save them as configuration. This is an example of how to extend the SimpleInfiniteFormBase class.</p></div>'
+      '#markup' => '<div><p>Enter any and all of your lucky numbers and save
+                            them as configuration. This is an example of how to
+                            extend the SimpleInfiniteFormBase class.</p></div>'
     ];
   }
 

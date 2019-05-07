@@ -7,13 +7,11 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * An example of a form that extends the SimpleInfiniteFormBase class.
- * You definitely want your extension to declare getFormId and getEditableConfigNames.
- * If the default versions of getConfigKeyName and getInputType don't work
- * for your purposes, declare those. In this case, the defaul textfield is perfect.
- * This example declares a build function that adds markup and a select list to
- * the top of the form. (You don't necessarily need to do that. The parent
- * build function might be all you need.) Since the select input was added
- * to the top of the form, a new submitForm function needed to be declared.
+ * It is intentionally more complicated than the Lucky Numbers form.
+ *
+ * This example declares a build function that adds select input to
+ * the top of the form.
+ *
  */
 
 class CoolestRockersForm extends SimpleInfiniteFormBase {
@@ -73,5 +71,5 @@ class CoolestRockersForm extends SimpleInfiniteFormBase {
     $config->save();
     parent::submitForm($form, $form_state);
   }
-  
+
 }

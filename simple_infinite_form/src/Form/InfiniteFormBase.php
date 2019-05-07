@@ -51,7 +51,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
    * If there is no config, this assumes we will want to show a single emtpy row.
    */
   public function initForm(FormStateInterface $form_state){
-    if ($form_state->get('already_initialized')) {
+    if ($form_state->get('infinite_values') !== NULL) {
       return;
     }
     $config = $this->config($this->getEditableConfigNames()[0]);
@@ -64,14 +64,14 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
           }
         }
       }
-      $form_state->setValue('infinite_values', $infinite_values);
+      $form_state->set('infinite_values', $infinite_values);
       $slots = count($config->get($this->getConfigKeyName()));
       $form_state->set('slots', $slots);
     }
     else {
+      $form_state->set('infinite_values', []);
       $form_state->set('slots', 1);
     }
-    $form_state->set('already_initialized', TRUE);
   }
 
   /**
@@ -107,6 +107,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
       '#type' => 'submit',
       '#value' => 'Add Slot',
       '#id' => 'add_slot',
+      '#limit_validation_errors' => array(),
       '#submit' => ['::addSlotSubmit'],
       '#ajax' => [
         'callback' => [$this, 'addSlotCallback'],
@@ -122,6 +123,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
       '#value' => 'Delete Slot',
       '#id' => "delete_slot-$i",
       '#name' => "delete_slot-$i", //doesn't work without a name!
+      '#limit_validation_errors' => array(),
       '#submit' => ['::deleteSlotSubmit'],
       '#attributes' => [
         'class' => [
@@ -163,14 +165,13 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
    */
   public function deleteSlotSubmit(array &$form, FormStateInterface $form_state){
     $id = $form_state->getTriggeringElement()['#id'];
-    dpm($id);
     $index = explode("-", $id)[1];
     $infinite_values = $form_state->getValue('infinite_values');
     array_splice($infinite_values, $index, 1);
-    $infinite_values = $form_state->setValue('infinite_values', $infinite_values);
+    $form_state->setValue('infinite_values', $infinite_values);
     $form_state->set('slots', $form_state->get('slots') - 1);
-    dpm($form_state->getValue('infinite_values'));
     $form_state->setRebuild(true);
+    $form_state->set('infinite_values', $infinite_values);
   }
 
   public function deleteSlotCallback(array &$form, FormStateInterface $form_state){

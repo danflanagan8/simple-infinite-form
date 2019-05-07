@@ -16,33 +16,16 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
    *
    * Should work well for...
    * date, email, machine_name, number, tel, textarea, textfield,
-   * url, entity_autocomplete (see getEntityType and getEntityBundles)
+   * url
    *
    * Does not work for...
    * button, checkbox, checkboxes, color, datelist, datetime, file, language_select,
    * managed_file, password, password_confirm, path, radio, radios, range,
    * search, select, submit, table, tableselect, token, value, vertical_tabs
-   * weight
+   * weight, entity_autocomplete
    */
   protected function getInputType() {
     return 'textfield';
-  }
-
-  /**
-   * Returns the entity type as a string.
-   * Used only if the Input Type is entity_autocomplete
-   */
-  protected function getEntityType() {
-    return 'node';
-  }
-
-  /**
-   * Returns an array of allowed bundle types.
-   * Used only if the Input Type is entity_autocomplete
-   * If empty, all bundles will be allowed.
-   */
-  protected function getEntityBundles() {
-    return array();
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -67,38 +50,21 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
    */
   public function populateInfiniteValues(array &$form, FormStateInterface $form_state) {
     $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
-    $config = $this->config($this->getEditableConfigNames()[0]);
-    $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
+    $infinite_values = $form_state->get('infinite_values');
     for ($i = 0; $i < $slots; $i++) {
-      $value = NULL;
-      if(isset($infinite_values[$i]['input'])){
-        if($this->getInputType() == 'entity_autocomplete'){
-          $value = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($infinite_values[$i]['input']);
-          $bundles = $this->getEntityBundles();
-        }else{
-          $value = $infinite_values[$i]['input'];
-        }
-      }
+      $value = isset($infinite_values[$i]['input']) ? $infinite_values[$i]['input'] : NULL;
       $form['infinite_values'][$i] = [
         '#type' => 'container',
       ];
-
       $form['infinite_values'][$i]['input'] = [
         '#type' => $this->getInputType(),
-        '#target_type' => $this->getEntityType(),
         '#required' => TRUE,
       ];
-      if ($value !== NULL) {
-        //don't explicitly set value as null. Just set it if we have it.
-        $form['infinite_values'][$i]['input']['#value'] = $value;
+      if (isset($infinite_values[$i]['input'])) {
+        $form['infinite_values'][$i]['input']['#default_value'] = $infinite_values[$i]['input'];
+        $form['infinite_values'][$i]['input']['#value'] = $infinite_values[$i]['input'];
       }
       $form['infinite_values'][$i]['delete'] = $this->makeDeleteSlotButton($i);
-
-      if(!empty($bundles)){
-        $form['infinite_values'][$i][0]['#selection_settings'] = [
-          'target_bundles' => $bundles,
-        ];
-      }
     }
   }
 

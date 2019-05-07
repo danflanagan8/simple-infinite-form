@@ -5,13 +5,6 @@ simple_infinite_form_example.lucky_numbers:
     _form: '\Drupal\simple_infinite_form_example\Form\LuckyNumbersForm'
   requirements:
     _permission: 'administer site configuration'
-simple_infinite_form_example.favorite_articles:
-  path: '/admin/config/development/simple_infinite_form_example/favorite_articles'
-  defaults:
-    _title: 'Favorite Articles'
-    _form: '\Drupal\simple_infinite_form_example\Form\FavoriteArticlesForm'
-  requirements:
-    _permission: 'administer site configuration'
 simple_infinite_form_example.coolest_rockers:
   path: '/admin/config/development/simple_infinite_form_example/coolest_rockers'
   defaults:
@@ -24,5 +17,12 @@ simple_infinite_form_example.speed_dial:
   defaults:
     _title: 'Speed Dial'
     _form: '\Drupal\simple_infinite_form_example\Form\SpeedDialForm'
+  requirements:
+    _permission: 'administer site configuration'
+simple_infinite_form_example.favorite_articles:
+  path: '/admin/config/development/simple_infinite_form_example/favorite_articles'
+  defaults:
+    _title: 'Favorite Articles'
+    _form: '\Drupal\simple_infinite_form_example\Form\FavoriteArticlesForm'
   requirements:
     _permission: 'administer site configuration'

@@ -2,23 +2,20 @@
 
 namespace Drupal\simple_infinite_form_example\Form;
 
-use Drupal\simple_infinite_form\Form\SimpleInfiniteFormBase;
+use Drupal\simple_infinite_form\Form\SuperInfiniteFormBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
- * An example of a form that extends the SimpleInfiniteFormBase class.
- * You definitely want your extnesion to declare getFormId and getEditableConfigNames.
- * If the default versions of getConfigKeyName and getInputType don't work
- * for your purposes, declare those. This example declares a build function that adds
- * markup to the top of the form. You don't necessarily need to do that. The parent
- * build function might be all you need. You could potentially add input fields to
- * the form in a build function. That would also require a new declaration of
- * the submit function.
+ * An example of a form that extends the SuperInfiniteFormBase class.
  *
- * This example also declares getEntityType and getEntityBundles to better
- * leverage the entity_autocomplete Input Type.
+ * This is intentionally more complicated than the Speed Dial form.
+ * One of the input elements is an entity_autocomplete element. In order for that
+ * to work, we need to override the populateInfiniteValues function from
+ * SuperInfiniteFormBase.
+ *
  */
 
-class FavoriteArticlesForm extends SimpleInfiniteFormBase {
+class FavoriteArticlesForm extends SuperInfiniteFormBase {
 
   /**
    * {@inheritdoc}
@@ -46,22 +43,26 @@ class FavoriteArticlesForm extends SimpleInfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getInputType() {
-    return 'entity_autocomplete';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getEntityType() {
-    return 'node';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getEntityBundles() {
-    return array('article');
+  protected function baseElement() {
+    return [
+      'article' => [
+        '#title' => 'Article',
+        '#type' => 'entity_autocomplete',
+        '#target_type' => 'node',
+        '#size' => 40,
+        '#selection_settings' => [
+          'target_bundles' => [
+            'article',
+          ],
+        ],
+        '#required' => TRUE,
+      ],
+      'color' => [
+        '#type' => 'color',
+        '#required' => FALSE,
+        '#description' => $this->t("Does this article make you feel a certain color?"),
+      ],
+    ];
   }
 
   /**
@@ -69,8 +70,57 @@ class FavoriteArticlesForm extends SimpleInfiniteFormBase {
    */
   protected function makeIntro() {
     return [
-      '#markup' => '<div><p>Select your favorite articles featured on this site. This is an example of how to extend the SimpleInfiniteFormBase class.</p></div>'
+      '#markup' => '<div><p>Select your favorite articles featured on this site.
+      This is an example of how to extend the SuperInfiniteFormBase class.
+      I had trouble with the delete button, form state, and entity_autocomplete
+      input elements. That is why the delete button only shows on the last row.</p></div>'
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function populateInfiniteValues(array &$form, FormStateInterface $form_state) {
+    $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
+    $infinite_values = $form_state->get('infinite_values');
+    for ($i = 0; $i < $slots; $i++) {
+      $row = $this->baseElement();
+      //add correct default value to each form element
+      foreach ($row as $key => $element) {
+        if (isset($infinite_values[$i][$key])) {
+          if ($key == 'article') {
+            $row[$key]['#default_value'] = \Drupal::entityTypeManager()->getStorage('node')->load($infinite_values[$i]['article']);
+          }
+          else {
+            $row[$key]['#default_value'] = $infinite_values[$i][$key];
+            $row[$key]['#value'] = $infinite_values[$i][$key];
+          }
+        }
+      }
+      //add some stuff to make it draggable
+      $row['#attributes'] = [
+        'class' => [
+          'draggable',
+        ],
+      ];
+      $row['weight'] = [
+        '#type' => 'weight',
+        '#value' => isset($infinite_values[$i]['weight']) ? $infinite_values[$i]['weight'] : 0,
+        '#attributes' => array('class' => array('idcfb-weight')),
+      ];
+
+      //I can't get the delete button to work right
+      //so I'm only putting it on the last row.
+      //I don't understand entity_autocomplete very well.
+      if ($i == ($slots - 1)) {
+        $row['delete'] = $this->makeDeleteSlotButton($i);
+      }
+      else {
+        $row['delete'] = $this->makeSpace();
+      }
+
+      $form['infinite_values'][] = $row;
+    }
   }
 
 }

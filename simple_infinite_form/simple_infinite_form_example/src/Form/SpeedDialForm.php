@@ -4,6 +4,13 @@ namespace Drupal\simple_infinite_form_example\Form;
 
 use Drupal\simple_infinite_form\Form\SuperInfiniteFormBase;
 
+/**
+ * An example of a form that extends the SuperInfiniteFormBase class.
+ *
+ * In most cases, these are the only functions you will have to declare.
+ *
+ */
+
 class SpeedDialForm extends SuperInfiniteFormBase {
 
   /**
@@ -42,7 +49,7 @@ class SpeedDialForm extends SuperInfiniteFormBase {
         '#required' => TRUE,
       ],
       'number' => [
-        '#type' => 'number',
+        '#type' => 'tel',
         '#title' => 'Phone Number',
         '#header_text' => 'Phone',
         '#required' => TRUE,
