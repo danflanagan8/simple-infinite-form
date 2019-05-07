@@ -27,50 +27,15 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
         '#type' => 'textfield',
         '#size' => 60,
         '#header_text' => $this->t('Text'),
+        '#required' => TRUE,
       ],
     ];
-  }
-
-  /**
-   * If a key is here, that input is not considered during this form's extra validation.
-   * However, it IS considered during rowIsEmpty.
-   */
-  protected function notRequired() {
-    return [];
-  }
-
-  /**
-   * If a key is here, the value is ignored during rowIsEmpty.
-   * This is useful for checkbox inputs among other things.
-   * "Weight" is treated as neverEmpty in the rowIsEmpty function.
-   */
-  protected function neverEmpty() {
-    return [];
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // When extending this class, you won't likely extend the functions below.
   // That's what makes this so simple.
   ///////////////////////////////////////////////////////////////////////////
-
-  /**
-  * {@inheritdoc}
-  */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-    $values = $form_state->getValue(['infinite_values']);
-    foreach($values as $index => $row){
-      if (!$this->rowIsEmpty($row)) {
-        foreach ($row as $key => $val) {
-          if ($val === '' || $val === NULL) {
-            if (!in_array($key, $this->notRequired())) {
-              $form_state->setErrorByName("infinite_values][$index][$key", "$key is required.");
-            }
-          }
-        }
-      }
-    }
-  }
 
   /**
    * Helper function to make a header for the table
@@ -88,7 +53,7 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  public function makeInfiniteValuesContainer() {
+  public function makeInfiniteValuesWrapper() {
     return [
       '#tree' => TRUE,
       '#type' => 'table',
@@ -132,19 +97,5 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       $row['delete'] = $this->makeDeleteSlotButton($i);
       $form['infinite_values'][] = $row;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rowIsEmpty($row) {
-    foreach ($row as $key => $val) {
-      if ($key != 'weight' && $key != 'delete' && !in_array($key, $this->neverEmpty())) {
-        if($val !== '' && $val !== NULL){
-          return FALSE;
-        }
-      }
-    }
-    return TRUE;
   }
 }

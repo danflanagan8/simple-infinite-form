@@ -53,7 +53,7 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  public function makeInfiniteValuesContainer() {
+  public function makeInfiniteValuesWrapper() {
     return [
       '#tree' => TRUE,
       '#type' => 'table',
@@ -93,18 +93,6 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
         ];
       }
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rowIsEmpty($row) {
-    foreach ($row as $key => $val) {
-      if($val !== '' && $val !== NULL){
-        return FALSE;
-      }
-    }
-    return TRUE;
   }
 
 }

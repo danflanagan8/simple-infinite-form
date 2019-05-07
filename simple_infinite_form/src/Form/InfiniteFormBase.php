@@ -36,10 +36,9 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-
     $this->initForm($form_state);
     $form['intro'] = $this->makeIntro();
-    $form['infinite_values'] = $this->makeInfiniteValuesContainer();
+    $form['infinite_values'] = $this->makeInfiniteValuesWrapper();
     $this->populateInfiniteValues($form, $form_state);
     $form['add_slot'] = $this->makeAddSlotButton();
 
@@ -53,7 +52,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
     $config = $this->config($this->getEditableConfigNames()[0]);
     if (!empty($config->get($this->getConfigKeyName()))) {
       $form_state->setValue('infinite_values', $config->get($this->getConfigKeyName()));
-      $slots = count($config->get($this->getConfigKeyName())) + 1;
+      $slots = count($config->get($this->getConfigKeyName()));
       $form_state->set('slots', $slots);
     }
     else {
@@ -68,15 +67,17 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->configFactory()->getEditable($this->getEditableConfigNames()[0]);
-    $rows = $form_state->cleanValues()->getValue(['infinite_values']);
+    $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
     $values_to_save = [];
-    //strip away empty values. Be careful not to strip zero, though.
-    foreach($rows as $row){
-      if(!$this->rowIsEmpty($row)){
-        if (count($row) === 1) {
-          $row = $row[0];
+    if (!empty($infinite_values)) {
+      foreach ($infinite_values as $key => $val) {
+        if (count($val) == 1) {
+          //unpack unneeded nesting
+          $values_to_save[] = $val;
         }
-        $values_to_save[] = $row;
+        else {
+          $values_to_save[] = $infinite_values[$key];
+        }
       }
     }
     $config->set($this->getConfigKeyName(), $values_to_save);
@@ -119,6 +120,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
   }
 
   public function addSlotCallback(array &$form, FormStateInterface $form_state){
+    drupal_set_message('You have unsaved changes', 'warning');
     return $form['infinite_values'];
   }
 
@@ -133,6 +135,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
   }
 
   public function deleteSlotCallback(array &$form, FormStateInterface $form_state){
+    drupal_set_message('You have unsaved changes', 'warning');
     return $form['infinite_values'];
   }
 

@@ -39,11 +39,13 @@ class SpeedDialForm extends SuperInfiniteFormBase {
         '#size' => 60,
         '#title' => 'Name',
         '#header_text' => 'Name',
+        '#required' => TRUE,
       ],
       'number' => [
         '#type' => 'tel',
         '#title' => 'Phone Number',
         '#header_text' => 'Phone',
+        '#required' => TRUE,
       ],
     ];
   }
