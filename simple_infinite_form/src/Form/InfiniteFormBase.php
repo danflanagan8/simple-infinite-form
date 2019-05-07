@@ -65,6 +65,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
         }
       }
       $form_state->set('infinite_values', $infinite_values);
+      $form_state->setValue('infinite_values', $infinite_values);
       $slots = count($config->get($this->getConfigKeyName()));
       $form_state->set('slots', $slots);
     }
@@ -107,7 +108,6 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
       '#type' => 'submit',
       '#value' => 'Add Slot',
       '#id' => 'add_slot',
-      '#limit_validation_errors' => array(),
       '#submit' => ['::addSlotSubmit'],
       '#ajax' => [
         'callback' => [$this, 'addSlotCallback'],
@@ -123,7 +123,6 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
       '#value' => 'Delete Slot',
       '#id' => "delete_slot-$i",
       '#name' => "delete_slot-$i", //doesn't work without a name!
-      '#limit_validation_errors' => array(),
       '#submit' => ['::deleteSlotSubmit'],
       '#attributes' => [
         'class' => [
@@ -166,7 +165,7 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
   public function deleteSlotSubmit(array &$form, FormStateInterface $form_state){
     $id = $form_state->getTriggeringElement()['#id'];
     $index = explode("-", $id)[1];
-    $infinite_values = $form_state->getValue('infinite_values');
+    $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
     array_splice($infinite_values, $index, 1);
     $form_state->setValue('infinite_values', $infinite_values);
     $form_state->set('slots', $form_state->get('slots') - 1);

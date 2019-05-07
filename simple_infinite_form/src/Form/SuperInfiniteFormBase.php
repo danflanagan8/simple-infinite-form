@@ -88,7 +88,6 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       //add correct default value to each form element
       foreach ($row as $key => $element) {
         if (isset($infinite_values[$i][$key])) {
-          $row[$key]['#default_value'] = $infinite_values[$i][$key];
           $row[$key]['#value'] = $infinite_values[$i][$key];
         }
       }
@@ -100,7 +99,7 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       ];
       $row['weight'] = [
         '#type' => 'weight',
-        '#value' => isset($infinite_values[$i]['weight']) ? $infinite_values[$i]['weight'] : 0,
+        '#default_value' => isset($form_state->getValue('infinite_values')[$i]['weight']) ? $form_state->getValue('infinite_values')[$i]['weight'] : 0,
         '#attributes' => array('class' => array('idcfb-weight')),
       ];
       $row['delete'] = $this->makeDeleteSlotButton($i);
