@@ -41,17 +41,30 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
     $form['infinite_values'] = $this->makeInfiniteValuesWrapper();
     $this->populateInfiniteValues($form, $form_state);
     $form['add_slot'] = $this->makeAddSlotButton();
+    $form['make_space'] = $this->makeSpace();
 
     return parent::buildForm($form, $form_state);
   }
 
+  /**
+   * Adds config values to form_state the first time buildForm runs.
+   * If there is no config, this assumes we will want to show a single emtpy row.
+   */
   public function initForm(FormStateInterface $form_state){
     if ($form_state->get('already_initialized')) {
       return;
     }
     $config = $this->config($this->getEditableConfigNames()[0]);
     if (!empty($config->get($this->getConfigKeyName()))) {
-      $form_state->setValue('infinite_values', $config->get($this->getConfigKeyName()));
+      $infinite_values = $config->get($this->getConfigKeyName());
+      if (!empty($infinite_values)) {
+        foreach ($infinite_values as $key => $row) {
+          if (!is_array($row)) {
+            $infinite_values[$key] = ['input' => $row];
+          }
+        }
+      }
+      $form_state->setValue('infinite_values', $infinite_values);
       $slots = count($config->get($this->getConfigKeyName()));
       $form_state->set('slots', $slots);
     }
@@ -60,7 +73,6 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
     }
     $form_state->set('already_initialized', TRUE);
   }
-
 
   /**
    * {@inheritdoc}
@@ -73,7 +85,12 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
       foreach ($infinite_values as $key => $val) {
         if (count($val) == 1) {
           //unpack unneeded nesting
-          $values_to_save[] = $val;
+          if (is_array($val)) {
+            $values_to_save[] = reset($val);
+          }
+          else {
+            $values_to_save[] = $val;
+          }
         }
         else {
           $values_to_save[] = $infinite_values[$key];
@@ -106,11 +123,26 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
       '#id' => "delete_slot-$i",
       '#name' => "delete_slot-$i", //doesn't work without a name!
       '#submit' => ['::deleteSlotSubmit'],
+      '#attributes' => [
+        'class' => [
+          'button--danger',
+        ]
+      ],
       '#ajax' => [
         'callback' => [$this, 'deleteSlotCallback'],
         'event' => 'click',
         'wrapper' => 'infinite-values-wrapper',
       ],
+    ];
+  }
+
+  /**
+   * I think it looks nicer if there's a little space between the "Add Slot" button
+   * and the "Save configuration" button. That's all this does.
+   */
+  public function makeSpace() {
+    return [
+      '#markup' => '<p>&nbsp;</p>',
     ];
   }
 
@@ -124,13 +156,20 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
     return $form['infinite_values'];
   }
 
+  /**
+   * Removes the unwanted data from $form_state. Note that wee can't just unset
+   * the row we want to delete; rather, we need to splice it. Otherwise we would
+   * end up with an empty row in the middle of the form.
+   */
   public function deleteSlotSubmit(array &$form, FormStateInterface $form_state){
     $id = $form_state->getTriggeringElement()['#id'];
+    dpm($id);
     $index = explode("-", $id)[1];
     $infinite_values = $form_state->getValue('infinite_values');
     array_splice($infinite_values, $index, 1);
     $infinite_values = $form_state->setValue('infinite_values', $infinite_values);
     $form_state->set('slots', $form_state->get('slots') - 1);
+    dpm($form_state->getValue('infinite_values'));
     $form_state->setRebuild(true);
   }
 

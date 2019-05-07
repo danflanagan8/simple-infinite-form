@@ -69,26 +69,33 @@ abstract class SimpleInfiniteFormBase extends InfiniteFormBase {
     $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
     $config = $this->config($this->getEditableConfigNames()[0]);
     $infinite_values = $form_state->cleanValues()->getValue('infinite_values');
-    for($i = 0; $i < $slots ;$i++){
+    for ($i = 0; $i < $slots; $i++) {
       $value = NULL;
-      if(isset($infinite_values[$i])){
+      if(isset($infinite_values[$i]['input'])){
         if($this->getInputType() == 'entity_autocomplete'){
-          $value = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($infinite_values[$i]);
+          $value = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($infinite_values[$i]['input']);
           $bundles = $this->getEntityBundles();
         }else{
-          $value = $infinite_values[$i];
+          $value = $infinite_values[$i]['input'];
         }
       }
-      $form['infinite_values'][$i][] = [
+      $form['infinite_values'][$i] = [
+        '#type' => 'container',
+      ];
+
+      $form['infinite_values'][$i]['input'] = [
         '#type' => $this->getInputType(),
         '#target_type' => $this->getEntityType(),
-        '#value' => $value,
-        '#required' => FALSE,
+        '#required' => TRUE,
       ];
-      $form['infinite_values'][$i][] = $this->makeDeleteSlotButton($i);
+      if ($value !== NULL) {
+        //don't explicitly set value as null. Just set it if we have it.
+        $form['infinite_values'][$i]['input']['#value'] = $value;
+      }
+      $form['infinite_values'][$i]['delete'] = $this->makeDeleteSlotButton($i);
 
       if(!empty($bundles)){
-        $form['infinite_values'][$i]['#selection_settings'] = [
+        $form['infinite_values'][$i][0]['#selection_settings'] = [
           'target_bundles' => $bundles,
         ];
       }

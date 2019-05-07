@@ -6,19 +6,19 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Form to be extended by modules that need an "infinite" config form
- * with draggable elements.
+ * with draggable elements. Still really simple, but with super results.
  *.
  * See the simple_infinite_form_example module for an example.
  */
-
 
 abstract class SuperInfiniteFormBase extends InfiniteFormBase {
 
   /**
    * The form elements that should make up each row.
-   * Note that you should not include anything about weight or tables.
+   * Note that you should NOT include anything about weight or tables.
    * That will happen automatically. Just put in the "mini form" that
-   * goes in each row of the table. Include a '#header_text' for custom header.
+   * goes in each row of the table. Include a '#header_text' to customize
+   * the header.
    *
    */
   protected function baseElement() {
@@ -58,7 +58,7 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       '#tree' => TRUE,
       '#type' => 'table',
       '#header' => $this->getHeader(),
-      '#prefix' => '<div id="infinite-values-wrapper"><h2>'.ucfirst($this->getConfigKeyName()).'</h2>',
+      '#prefix' => '<div id="infinite-values-wrapper">',
       '#suffix' => '</div>',
       '#tabledrag' => [
         [
@@ -81,7 +81,10 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
       $row = $this->baseElement();
       //add correct default value to each form element
       foreach ($row as $key => $element) {
-        $row[$key]['#value'] = isset($infinite_values[$i][$key]) ? $infinite_values[$i][$key] : NULL;
+        if (isset($infinite_values[$i][$key])) {
+          //don't explicitly set value as null. Just set it if we have it.
+          $row[$key]['#value'] = $infinite_values[$i][$key];
+        }
       }
       //add some stuff to make it draggable
       $row['#attributes'] = [

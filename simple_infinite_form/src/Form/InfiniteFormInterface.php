@@ -12,7 +12,7 @@ interface InfiniteFormInterface {
   public function makeInfiniteValuesWrapper();
 
   /**
-   * @return array|null
+   * @return null
    */
   public function populateInfiniteValues(array &$form, FormStateInterface $form_state);
 
