@@ -103,6 +103,18 @@ abstract class InfiniteFormBase extends ConfigFormBase implements InfiniteFormIn
     parent::submitForm($form, $form_state);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $id = $form_state->getTriggeringElement()['#id'];
+    if (strpos($id, "delete_slot") > -1 || strpos($id, "add_slot") > -1) {
+      $form_state->clearErrors();
+      return;
+    }
+    parent::validateForm($form, $form_state);
+  }
+
   public function makeAddSlotButton() {
     return [
       '#type' => 'submit',
