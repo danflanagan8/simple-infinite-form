@@ -43,7 +43,7 @@ class FavoriteArticlesForm extends SuperInfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function baseElement() {
+  protected function baseElement($index = NULL) {
     return [
       'article' => [
         '#title' => 'Article',

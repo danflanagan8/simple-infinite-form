@@ -39,7 +39,7 @@ class SpeedDialForm extends SuperInfiniteFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function baseElement() {
+  protected function baseElement($index = NULL) {
     return [
       'name' => [
         '#type' => 'textfield',
