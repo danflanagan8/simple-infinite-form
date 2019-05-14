@@ -27,7 +27,7 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
    * For other intput types, you will likely have to customize populateInfiniteValues.
    *
    */
-  protected function baseElement() {
+  protected function baseElement($index = NULL) {
     return [
       'text' => [
         '#type' => 'textfield',
@@ -84,7 +84,7 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
     $slots = $form_state->get('slots') ? $form_state->get('slots') : 0;
     $infinite_values = $form_state->get('infinite_values');
     for ($i = 0; $i < $slots; $i++) {
-      $row = $this->baseElement();
+      $row = $this->baseElement($i);
       //add correct default value to each form element
       foreach ($row as $key => $element) {
         if (isset($infinite_values[$i][$key])) {
