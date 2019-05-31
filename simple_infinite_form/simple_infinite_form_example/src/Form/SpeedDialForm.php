@@ -54,6 +54,14 @@ class SpeedDialForm extends SuperInfiniteFormBase {
         '#header_text' => 'Phone',
         '#required' => TRUE,
       ],
+      'distance' => [
+        '#type' => 'select',
+        '#header_text' => 'Long Distance',
+        '#options' => [
+          'local' => 'Local',
+          'long_distance' => 'Long Distance',
+        ],
+      ],
       'notes' => [
         '#type' => 'textarea',
         '#title' => 'Notes',

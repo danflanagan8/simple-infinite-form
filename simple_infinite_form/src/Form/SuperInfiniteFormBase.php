@@ -20,11 +20,12 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
    * goes in each row of the table. Include a '#header_text' to customize
    * the header. Do not enter any default_value or value either.
    *
-   * Many input types are simple like...checkbox, checkboxes, color, date, email,
-   * machine_name, number, radio, radios, select,  tel, textarea, textfield,
-   * url
+   * Many input types are simple like... color, date, email, machine_name,
+   * number, radio, radios, select, tel, textarea, textfield, url
    *
-   * For other intput types, you will likely have to customize populateInfiniteValues.
+   * Checkboxes and Radios don't work well. Use select as an alternative.
+   *
+   * For other intput types, you may have to customize populateInfiniteValues.
    *
    */
   protected function baseElement($index = NULL) {
@@ -85,9 +86,9 @@ abstract class SuperInfiniteFormBase extends InfiniteFormBase {
     $infinite_values = $form_state->get('infinite_values');
     for ($i = 0; $i < $slots; $i++) {
       $row = $this->baseElement($i);
-      //add correct default value to each form element
+      // add correct default value to each form element
       foreach ($row as $key => $element) {
-        if (isset($infinite_values[$i][$key])) {
+        if (isset($infinite_values[$i])) {
           $row[$key]['#value'] = $infinite_values[$i][$key];
         }
       }

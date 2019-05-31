@@ -1,8 +1,7 @@
 name: Simple Infinite Form Example
 type: module
-description: 'Provides example of form that extends SimpleInfiniteFormBase.'
-package: form
-version: VERSION
-core: 8.x
+description: 'Provides examples of that extend SimpleInfiniteFormBase and SuperInfiniteFormBase.'
+package: Development
 dependencies:
   - simple_infinite_form:simple_infinite_form
+core: 8.x

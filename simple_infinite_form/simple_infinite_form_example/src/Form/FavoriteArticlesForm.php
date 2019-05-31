@@ -93,7 +93,6 @@ class FavoriteArticlesForm extends SuperInfiniteFormBase {
           }
           else {
             $row[$key]['#default_value'] = $infinite_values[$i][$key];
-            $row[$key]['#value'] = $infinite_values[$i][$key];
           }
         }
       }
